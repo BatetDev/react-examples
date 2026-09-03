@@ -8,11 +8,14 @@ class ClassInput extends Component {
     this.state = {
       todos: ['Just some demo tasks', 'As an example'],
       inputVal: '',
+      editingIndex: null,
+      editText: '',
     };
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
   }
 
   handleInputChange(e) {
@@ -36,6 +39,27 @@ class ClassInput extends Component {
     }));
   }
 
+  handleEdit(index) {
+    this.setState((state) => ({
+      editingIndex: index,
+      editText: state.todos[index],
+    }));
+  }
+
+  handleEditChange = (e) => {
+    this.setState({ editText: e.target.value });
+  };
+
+  handleResubmit = (index) => {
+    this.setState((state) => ({
+      todos: state.todos.map((todo, i) =>
+        i === index ? state.editText : todo,
+      ),
+      editingIndex: null,
+      editText: '',
+    }));
+  };
+
   render() {
     return (
       <section>
@@ -54,12 +78,26 @@ class ClassInput extends Component {
         <h4>All the tasks!</h4>
         {/* The list of all the To-Do's, displayed */}
         <ul>
-          {this.state.todos.map((todo, index) => (
-            <li key={index}>
-              {todo}{' '}
-              <button onClick={() => this.handleDelete(index)}>Delete</button>
-            </li>
-          ))}
+          {this.state.todos.map((todo, index) =>
+            this.state.editingIndex === index ? (
+              <li key={index}>
+                <input
+                  type="text"
+                  value={this.state.editText}
+                  onChange={this.handleEditChange}
+                />
+                <button onClick={() => this.handleResubmit(index)}>
+                  Resubmit
+                </button>
+              </li>
+            ) : (
+              <li key={index}>
+                {todo}
+                <button onClick={() => this.handleEdit(index)}>Edit</button>
+                <button onClick={() => this.handleDelete(index)}>Delete</button>
+              </li>
+            ),
+          )}
         </ul>
         <Count todos={this.state.todos} />
       </section>
